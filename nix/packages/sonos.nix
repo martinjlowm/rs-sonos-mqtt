@@ -4,10 +4,14 @@
   crane,
   stdenv,
   pkgs,
-}: let
-  rustToolchain = pkgsBuildHost.rust-bin.fromRustupToolchainFile (src + /rust-toolchain.toml);
-  craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
+}: {craneExtraArgs ? {}}: let
+  rustToolchain = builtins.trace pkgs.pkgsBuildHost.system (pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile (src + /rust-toolchain.toml));
+  craneLib = (crane.mkLib pkgs.pkgsBuildHost).overrideToolchain rustToolchain;
 in
-  craneLib.buildPackage {
-    src = craneLib.cleanCargoSource (craneLib.path src);
-  }
+  craneLib.buildPackage (builtins.trace ({
+        src = craneLib.cleanCargoSource (craneLib.path src);
+      }
+      // craneExtraArgs) {
+      src = craneLib.cleanCargoSource (craneLib.path src);
+    }
+    // craneExtraArgs)

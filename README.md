@@ -13,5 +13,5 @@ nix build .#image
 Flash the image with
 
 ```bash
-sudo zstd -vdcfT6 result/sd-image/nixos-sd-image-<...>-armv7l-linux.img.zst | sudo dd of=/dev/rdiskX status=progress bs=4M
+flash /dev/rdiskX
 ```
