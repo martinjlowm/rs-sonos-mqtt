@@ -10,7 +10,7 @@ in {
   hardware.deviceTree.name = "exynos5422-odroidxu4.dtb";
 
   # Override the source for 6.1 with Hardkernel's fork for ODROID XU4
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackagesFor (pkgs.linux_6_1.override {
+  boot.kernelPackages = lib.mkForce (pkgs.linuxPackagesFor (pkgs.linux_6_1.override {
     argsOverride = rec {
       version = "6.1.y";
       modDirVersion = builtins.replaceStrings ["y"] ["77"] version;
@@ -26,7 +26,7 @@ in {
 
       defconfig = "odroidxu4_defconfig";
     };
-  });
+  }));
 
   # This will be replaced by the second line soon in unstable
   boot.zfs.enableUnstable = false;
