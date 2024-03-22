@@ -20,6 +20,7 @@ impl From<()> for Error {
         Error
     }
 }
+
 // impl std::convert::TryFrom<Error> for v3::PublishAck {
 //     type Error = Error;
 
@@ -169,7 +170,7 @@ async fn main() -> Result<()> {
         .unwrap();
 
     match task.await {
-        Ok(_) => info!("Doneso!"),
+        Ok(_) => info!("Doneso!!"),
         Err(e) => error!("Yikes! {}", e),
     };
 

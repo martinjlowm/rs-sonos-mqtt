@@ -10,18 +10,18 @@ in {
   hardware.deviceTree.name = "exynos5422-odroidxu4.dtb";
 
   # Override the source for 6.1 with Hardkernel's fork for ODROID XU4
-  boot.kernelPackages = lib.mkForce (pkgs.linuxPackagesFor (pkgs.linux_6_1.override {
+  boot.kernelPackages = lib.mkForce (pkgs.linuxPackagesFor (pkgs.linux_6_6.override {
     argsOverride = rec {
-      version = "6.1.y";
-      modDirVersion = builtins.replaceStrings ["y"] ["77"] version;
+      version = "6.6.y";
+      modDirVersion = builtins.replaceStrings ["y"] ["13"] version;
 
       src = pkgs.fetchurl {
         # The upstream kernel assumes to be built at the project root
         # url = "https://github.com/hardkernel/linux/archive/odroidxu4-${version}.tar.gz";
         # sha256 = "sha256-9rel2TRSwdkEwQN+xj8B38B/f6/Zdetu1Yg2a2plA1A=";
         # Use a patched version instead
-        url = "https://github.com/martinjlowm/linux/archive/afa3e7707f62602f97c499c7c357ce714ecc3b44.tar.gz";
-        sha256 = "sha256-mIvN/8ZZ2gU1OWtbRZG0gFClnZZHYmvMUt9NvkpZVY4=";
+        url = "https://github.com/martinjlowm/linux/archive/odroid-${version}.tar.gz";
+        sha256 = "sha256-I0qRiLUi8xJQhXvsKB16xliWljWQgs1Latp9QoM8GGg=";
       };
 
       defconfig = "odroidxu4_defconfig";
@@ -29,8 +29,8 @@ in {
   }));
 
   # This will be replaced by the second line soon in unstable
-  boot.zfs.enableUnstable = false;
-  # boot.zfs.package = pkgs.zfsStable;
+  # boot.zfs.enableUnstable = true;
+  boot.zfs.package = pkgs.zfsStable;
 
   # There's no reason to populate with Raspberry Pi files
   sdImage.populateFirmwareCommands = "";
@@ -95,14 +95,12 @@ in {
 
   systemd.services.sonos = {
     after = ["network.target" "systemd-user-sessions.service" "network-online.target"];
-
+    wants = [ "network-online.target" ];
     serviceConfig = {
       Type = "forking";
       ExecStart = "${pkgs.pkgsHostTarget.sonos {
-        craneExtraArgs = {
-          nativeBuildInputs = [pkgs.pkgsBuildHost.autoPatchelfHook];
-          cargoBuildCommand = "HOME=$(pwd) ${pkgs.pkgsBuildHost.cargo-zigbuild}/bin/cargo-zigbuild build --profile release --target armv7-unknown-linux-gnueabihf";
-        };
+        nativeBuildInputs = [pkgs.pkgsBuildHost.autoPatchelfHook];
+        cargoBuildCommand = "HOME=$(pwd) ${pkgs.pkgsBuildHost.cargo-zigbuild}/bin/cargo-zigbuild build --profile release --target armv7-unknown-linux-gnueabihf";
       }}/bin/sonos";
       TimeoutSec = 30;
       Restart = "on-failure";
